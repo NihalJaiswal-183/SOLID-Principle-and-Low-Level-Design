@@ -3,21 +3,24 @@ import java.util.*;
 
 import LLDTicTacToe.Model.Board;
 import LLDTicTacToe.Model.Player;
+import LLDTicTacToe.Model.PlayerFactory;
 import LLDTicTacToe.Model.PlayingEntity;
 
 class TicTacToeGame{
     Deque<Player> players;
     Board gameBoard;
+    private Scanner scanner;
 
     public void initialiseGame(){
         players = new LinkedList<>();
+        scanner = new Scanner(System.in);
         setPlayers();
         gameBoard = new Board(3);
+
     }
 
     private void setPlayers(){
         System.out.print("Enter the no of players");
-        Scanner scanner = new Scanner(System.in);
 
         int noOfPlayers = scanner.nextInt(); 
         scanner.nextLine();
@@ -25,24 +28,35 @@ class TicTacToeGame{
         for(int playerCount=1; playerCount<=noOfPlayers; playerCount++){
             System.out.println("Enter Player no" + playerCount + " Name");
             String playerName = scanner.nextLine();
-
-            System.out.println("Enter player playing Entity type");
-            // i need to add validation of chosen option will implement later on
-            String playerEntityType = scanner.nextLine();
-            Player player;
-            if(playerEntityType.equals("X")){
-                player = new Player(playerName, PlayingEntity.X);
-            }
-            else{
-                player = new Player(playerName, PlayingEntity.O);
-            }
+            String playerEntityType = getPlayerEntityInput();
+            PlayerFactory playerFactoryObj = new PlayerFactory();
+            Player player = playerFactoryObj.getPlayerInstance(playerName, playerEntityType);
             this.players.addLast(player);
         }        
     }
 
+    private String getPlayerEntityInput(){
+        String playerEntityType;
+        Boolean isInputCompleted = true;
+        do {
+            System.out.println("Enter player playing Entity type (X, O, ...)");
+            playerEntityType = scanner.nextLine();
+    
+            try {
+
+                PlayingEntity.valueOf(playerEntityType.toUpperCase());
+                isInputCompleted = true;
+            } catch (IllegalArgumentException e) {
+                System.out.println("Invalid playing entity type. Please enter 'X' or 'O'.");
+                isInputCompleted = false;
+            }
+        } while (!isInputCompleted);
+    
+        return playerEntityType.toUpperCase();
+    }
+
     public void startGame(){
         Boolean isGameEnded = false;
-        Scanner scanner = new Scanner(System.in);
         while(isGameEnded == false){
             gameBoard.printBoard();
             List<AbstractMap.SimpleEntry<Integer, Integer>> freeSpaces =  gameBoard.getFreeCells();
@@ -52,7 +66,7 @@ class TicTacToeGame{
                 continue;
             }
             Player playerTurn = this.players.removeFirst();
-            System.out.print("Player:" + playerTurn.name + " Enter row,column: "+ playerTurn.playingEntity);
+            System.out.print("Player:" + playerTurn.name + " Enter row,column: ");
             String input = scanner.nextLine();
             String[] coOrdinates = input.split(",");
             // NEEDED TO ADD VALIDATIONS FOR INPUT AS WELL
@@ -72,7 +86,6 @@ class TicTacToeGame{
                 players.addFirst(playerTurn);
             } 
         }
-        // scanner.close();
     }
 
     public boolean isThereWinner(int row, int column, PlayingEntity playingEntity) {
