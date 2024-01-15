@@ -20,11 +20,7 @@ class TicTacToeGame{
     }
 
     private void setPlayers(){
-        System.out.print("Enter the no of players");
-
-        int noOfPlayers = scanner.nextInt(); 
-        scanner.nextLine();
-
+        int noOfPlayers = 2; 
         for(int playerCount=1; playerCount<=noOfPlayers; playerCount++){
             System.out.println("Enter Player no" + playerCount + " Name");
             String playerName = scanner.nextLine();
@@ -43,7 +39,6 @@ class TicTacToeGame{
             playerEntityType = scanner.nextLine();
     
             try {
-
                 PlayingEntity.valueOf(playerEntityType.toUpperCase());
                 isInputCompleted = true;
             } catch (IllegalArgumentException e) {
